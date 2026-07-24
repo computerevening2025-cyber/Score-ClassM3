@@ -27,7 +27,14 @@
     <div class="search-box">
      
         <h2>🔍 ກວດສອບຄະແນນ ຫ້ອງ ມ3</h2>
-        
+        <div class="form-group" style="margin-bottom: 15px;">
+    <label for="classSelect" style="display: block; font-weight: bold; margin-bottom: 5px;">
+        🏫 ເລືອກຫ້ອງຮຽນ:
+    </label>
+    <select id="classSelect" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc; font-size: 16px;">
+        <option value="">ກຳລັງໂຫຼດຫ້ອງຮຽນທັງໝົດ...</option>
+    </select>
+</div>
         <select id="monthSelect">
             <option value="month_9">ຄະແນນ ປະຈຳເດືອນ 9</option>
             <option value="month_10">ຄະແນນ ປະຈຳເດືອນ 10</option>
@@ -40,6 +47,7 @@
             <option value="month_5">ຄະແນນ ປະຈຳພາກຮຽນທີ II</option>
             <option value="month_6">ຄະແນນ ປະຈຳເດືອນ 5</option>
         </select>
+        
         <br>
         <input type="text" id="studentId" placeholder="ປ້ອນລະຫັດນັກຮຽນ (ເຊັ່ນ: A01)">
         <br>
