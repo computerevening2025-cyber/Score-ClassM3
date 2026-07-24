@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="lo">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ລະບົບປ້ອນຄະແນນ - ສຳລັບຄູປະຈຳຊັ້ນ</title>
+    <style>
+        body { font-family: 'Phetsarath OT', sans-serif; padding: 20px; background-color: #eef2f7; }
+        .card { background: white; padding: 25px; border-radius: 12px; max-width: 600px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h2 { text-align: center; color: #333; margin-top: 0; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; color: #555; }
+        input, select { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 6px; font-size: 15px; box-sizing: border-box; }
+        button { background: #28a745; color: white; border: none; padding: 12px; border-radius: 6px; font-size: 16px; cursor: pointer; width: 100%; font-weight: bold; margin-top: 10px; }
+        button:hover { background: #218838; }
+        .btn-add-class { background: #17a2b8; margin-top: 5px; }
+        .btn-add-class:hover { background: #138496; }
+        .login-box { max-width: 400px; }
+        .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
+        .hidden { display: none; }
+        .admin-badge { background: #dc3545; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; float: right; }
+        .add-class-box { background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #6c757d; }
+    </style>
+</head>
+<body>
+
+<!-- 1. ໜ້າເຂົ້າສູ່ລະບົບ (Login) -->
+<div id="loginSection" class="card login-box">
+    <h2>🔐 ເຂົ້າສູ່ລະບົບປ້ອນຄະແນນ</h2>
+    <div class="form-group">
+        <label>ລະຫັດຜ່ານ (Passcode):</label>
+        <input type="password" id="passcode" placeholder="ປ້ອນລະຫັດຜ່ານຂອງຄູ">
+    </div>
+    <button onclick="checkLogin()">ເຂົ້າສູ່ລະບົບ</button>
+    <p id="loginError" style="color:red; text-align:center; margin-top:10px;"></p>
+</div>
+
+<!-- 2. ໜ້າປ້ອນຄະແນນ -->
+<div id="adminSection" class="card hidden">
+    <h2>📝 ລະບົບບັນທຶກຄະແນນ <span id="roleBadge"></span></h2>
+
+    <!-- ສ່ວນເພີ່ມຫ້ອງຮຽນໃໝ່ (ສະເພາະ Super Admin) -->
+    <div id="addClassSection" class="add-class-box hidden">
+        <label style="color:#0056b3;">➕ ເພີ່ມຫ້ອງຮຽນໃໝ່ (ສະເພາະແອັດມິນ):</label>
+        <div style="display:flex; gap:10px;">
+            <input type="text" id="newClassName" placeholder="ເຊັ່ນ: M1_1, M4_2, M7">
+            <button class="btn-add-class" style="width:140px; margin:0;" onclick="addNewClass()">ເພີ່ມຫ້ອງ</button>
+        </div>
+    </div>
+    
+    <div class="form-group">
+        <label>ເລືອກຫ້ອງຮຽນ:</label>
+        <select id="classSelect">
+            <option value="">-- ກຳລັງໂຫຼດຫ້ອງຮຽນ... --</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>ເລືອກເດືອນ:</label>
+        <select id="monthSelect">
+            <option value="month_9">ຄະແນນ ປະຈຳເດືອນ 9</option>
+            <option value="month_10">ຄະແນນ ປະຈຳເດືອນ 10</option>
+            <option value="month_11">ຄະແນນ ປະຈຳເດືອນ 11</option>
+            <option value="month_12">ຄະແນນ ປະຈຳເດືອນ 12</option>
+            <option value="month_1">ຄະແນນ ປະຈຳພາກຮຽນທີ I</option>
+            <option value="month_2">ຄະແນນ ປະຈຳເດືອນ 2</option>
+            <option value="month_3">ຄະແນນ ປະຈຳເດືອນ 3</option>
+            <option value="month_4">ຄະແນນ ປະຈຳເດືອນ 4</option>
+            <option value="month_5">ຄະແນນ ປະຈຳພາກຮຽນທີ II</option>
+            <option value="month_6">ຄະແນນ ປະຈຳເດືອນ 5</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label>ລະຫັດນັກຮຽນ (ເຊັ່ນ: A01):</label>
+        <input type="text" id="studentId" placeholder="ປ້ອນລະຫັດນັກຮຽນ">
+    </div>
+
+    <div class="form-group">
+        <label>ຊື່ ແລະ ນາມສະກຸນ:</label>
+        <input type="text" id="studentName" placeholder="ປ້ອນຊື່ ແລະ ນາມສະກຸນ">
+    </div>
+
+    <hr>
+    <h3>📊 ປ້ອນຄະແນນແຕ່ລະວິຊາ (0 - 10)</h3>
+    <div class="score-grid" id="scoreFields"></div>
+
+    <button onclick="saveScore()">💾 ບັນທຶກຄະແນນລົງລະບົບ</button>
+    <p id="statusMsg" style="text-align:center; font-weight:bold; margin-top:15px;"></p>
+</div>
+
+<script>
+    const FIREBASE_BASE_URL = "https://classscorem3-default-rtdb.firebaseio.com";
+
+    const PASSCODES = {
+        "admin123": "ALL", // ລະຫັດແອັດມິນຫຼັກ
+        "passM1": "M1",
+        "passM2": "M2",
+        "passM3": "M3",
+        "passM4": "M4"
+    };
+
+    const subjectsList = [
+        "ພາສາລາວ-ວັນນະຄະດີ", "ຄະນິດສາດ", "ວິທະຍາສາດທຳມະຊາດ", "ພູມສາດ",
+        "ປະຫວັດສາດ", "ສຶກສາພົນລະເມືອງ", "ຄອມພິວເຕີ້", "ພື້ນຖານວິຊາຊີບ",
+        "ພາສາອັງກິດ", "ສິລະປະກຳ", "ສິລະປະດົນຕີ", "ພະລະສຶກສາ"
+    ];
+
+    let userRole = "";
+
+    // ສ້າງຊ່ອງປ້ອນຄະແນນ
+    const scoreFieldsDiv = document.getElementById('scoreFields');
+    subjectsList.forEach((subject) => {
+        scoreFieldsDiv.innerHTML += `
+            <div>
+                <label style="font-size:13px;">${subject}</label>
+                <input type="number" min="0" max="10" class="subject-input" data-subject="${subject}" placeholder="0">
+            </div>
+        `;
+    });
+
+    // ດຶງລາຍຊື່ຫ້ອງຮຽນທັງໝົດຈາກ Firebase
+    function loadClasses() {
+        fetch(${FIREBASE_BASE_URL}/classes.json)
+            .then(res => res.json())
+            .then(classes => {
+                const classSelect = document.getElementById('classSelect');
+                classSelect.innerHTML = "";
+
+                // ຖ້າຍັງບໍ່ມີຫ້ອງຮຽນໃດໆ ให้ตั้งค่าเริ่มต้นไว้ก่อน
+                let classList = classes ? Object.values(classes) : ["M1", "M2", "M3", "M4", "M5", "M6"];
+
+                classList.forEach(cls => {
+                    classSelect.innerHTML += <option value="${cls}">ຫ້ອງ ${cls}</option>;
+                });
+
+                if (userRole !== "ALL" && userRole !== "") {
+                    classSelect.value = userRole;
+                    classSelect.disabled = true;
+                }
+            })
+            .catch(err => console.error("Error loading classes:", err));
+    }
+
+    function checkLogin() {
+        const pass = document.getElementById('passcode').value;
+        if (PASSCODES[pass]) {
+            userRole = PASSCODES[pass];
+            document.getElementById('loginSection').classList.add('hidden');
+            document.getElementById('adminSection').classList.remove('hidden');
+
+            loadClasses();
+
+            if (userRole === "ALL") {
+                document.getElementById('addClassSection').classList.remove('hidden');
+                document.getElementById('roleBadge').innerText = (Super Admin Main);
+                document.getElementById('roleBadge').className = 'admin-badge';
+            } else {
+                document.getElementById('roleBadge').innerText = (ຄູປະຈຳຊັ້ນ ${userRole});
+            }
+        } else {
+            document.getElementById('loginError').innerText = "❌ ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ";
+        }
+    }
+
+    // ຟັງຊັນເພີ່ມຫ້ອງຮຽນໃໝ່
+    function addNewClass() {
+        const newClass = document.getElementById('newClassName').value.trim().toUpperCase();
+        if (!newClass) {
+            alert("ກະລຸນາປ້ອນຊື່ຫ້ອງຮຽນ");
+            return;
+        }
+
+        fetch(${FIREBASE_BASE_URL}/classes/${newClass}.json, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(newClass)
+        })
+        .then(() => {
+            alert(✅ ເພີ່ມຫ້ອງ ${newClass} ສຳເລັດແລ້ວ!);
+            document.getElementById('newClassName').value = "";
+            loadClasses(); // ໂຫຼດລາຍຊື່ຫ້ອງໃໝ່
+        })
+        .catch(err => alert("❌ ເກີດຂໍ້ຜິດພາດ: " + err.message));
+    }
+
+    function saveScore() {
+        const studentClass = document.getElementById('classSelect').value;
+        const selectedMonth = document.getElementById('monthSelect').value;
+        const studentId = document.getElementById('studentId').value.trim();
+        const studentName = document.getElementById('studentName').value.trim();
+        const statusMsg = document.getElementById('statusMsg');
+
+        if (!studentClass) {
+            alert("ກະລຸນາເລືອກຫ້ອງຮຽນ");
+            return;
+        }
+        if (!studentId) {
+            alert("ກະລຸນາປ້ອນລະຫັດນັກຮຽນ");
+            return;
+        }
+
+        statusMsg.style.color = "blue";
+        statusMsg.innerText = "⏳ ກຳລັງບັນທຶກຂໍ້ມູນ...";
+
+        let scoresData = {};
+        document.querySelectorAll('.subject-input').forEach(input => {
+            const subj = input.getAttribute('data-subject');
+            scoresData[subj] = input.value !== "" ? Number(input.value) : 0;
+        });
+
+        const saveData = {
+            studentId: studentId,
+            name: studentName,
+            scores: scoresData
+        };
+
+        const firebaseUrl = ${FIREBASE_BASE_URL}/students_${studentClass}/${studentId}/months/${selectedMonth}.json;
+
+        fetch(firebaseUrl, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(saveData)
+        })
+        .then(res => res.json())
+        .then(data => {
+            statusMsg.style.color = "green";
+            statusMsg.innerText = "✅ ບັນທຶກຄະແນນຮຽບຮ້ອຍແລ້ວ!";
+            setTimeout(() => { statusMsg.innerText = ""; }, 3000);
+        })
+        .catch(err => {
+            console.error(err);
+            statusMsg.style.color = "red";
+            statusMsg.innerText = "❌ ບັນທຶກບໍ່ສຳເລັດ: " + err.message;
+        });
+    }
+</script>
+
+</body>
+</html>
