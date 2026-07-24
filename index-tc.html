@@ -187,6 +187,35 @@
             runSearch();
         }
     });
+    // ฟังก์ชันโหลดรายชื่อห้องจาก Firebase แบบ Auto
+function loadClassesAuto() {
+    fetch(${FIREBASE_BASE_URL}/classes.json)
+        .then(res => res.json())
+        .then(classes => {
+            const classSelect = document.getElementById('classSelect');
+            classSelect.innerHTML = '<option value="ALL">-- ເລືອກຫ້ອງຮຽນທັງໝົດ --</option>';
+
+            if (classes) {
+                // ถ้ามีข้อมูลห้องใน Database ให้ดึงมาสร้างตัวเลือกออโต้
+                const classList = Object.values(classes);
+                classList.forEach(cls => {
+                    classSelect.innerHTML += <option value="${cls}">ຫ້ອງ ${cls}</option>;
+                });
+            } else {
+                // กรณีในระบบยังไม่มีการสร้างห้อง ให้ใส่ค่าเริ่มต้นไว้
+                const defaultClasses = ["M1", "M2", "M3", "M4", "M5", "M6"];
+                defaultClasses.forEach(cls => {
+                    classSelect.innerHTML += <option value="${cls}">ຫ້ອງ ${cls}</option>;
+                });
+            }
+        })
+        .catch(err => {
+            console.error("Error loading classes:", err);
+        });
+}
+
+// เรียกใช้งานฟังก์ชันทันทีเมื่อเปิดหน้าเว็บ
+document.addEventListener("DOMContentLoaded", loadClassesAuto);
 </script>
 
 </body>
