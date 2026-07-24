@@ -43,7 +43,7 @@
     <div id="addClassSection" class="add-class-box hidden">
         <label style="color:#0056b3;">➕ ເພີ່ມຫ້ອງຮຽນໃໝ່ (ສະເພາະແອັດມິນ):</label>
         <div style="display:flex; gap:10px;">
-            <input type="text" id="newClassName" placeholder="ເຊັ່ນ: M1_1, M4_2, M7">
+            <input type="text" id="newClassName" placeholder="ເຊັ່ນ: M1, M2, M3_1">
             <button class="btn-add-class" style="width:140px; margin:0;" onclick="addNewClass()">ເພີ່ມຫ້ອງ</button>
         </div>
     </div>
@@ -92,12 +92,15 @@
 <script>
     const FIREBASE_BASE_URL = "https://classscorem3-default-rtdb.firebaseio.com";
 
+    // 🔑 ຕັ້ງຄ່າລະຫັດຜ່ານ (ທ່ານຄູສາມາດເພີ່ມ/ແກ້ໄຂລະຫັດຜ່ານຢູ່ບ່ອນນີ້ໄດ້ເລີຍ)
     const PASSCODES = {
-        "admin123": "ALL", // ລະຫັດແອັດມິນຫຼັກ
-        "passM1": "M1",
-        "passM2": "M2",
-        "passM3": "M3",
-        "passM4": "M4"
+        "admin123": "ALL", // ລະຫັດແອັດມິນຫຼັກ (ເລືອກໄດ້ທຸກຫ້ອງ + ເພີ່ມຫ້ອງໃໝ່ໄດ້)
+        "passM1": "M1",    // ລະຫັດຄູ ມ.1
+        "passM2": "M2",    // ລະຫັດຄູ ມ.2
+        "passM3": "M3",    // ລະຫັດຄູ ມ.3
+        "passM4": "M4",    // ລະຫັດຄູ ມ.4
+        "passM5": "M5",    // ລະຫັດຄູ ມ.5
+        "passM6": "M6"     // ລະຫັດຄູ ມ.6
     };
 
     const subjectsList = [
@@ -108,7 +111,6 @@
 
     let userRole = "";
 
-    // ສ້າງຊ່ອງປ້ອນຄະແນນ
     const scoreFieldsDiv = document.getElementById('scoreFields');
     subjectsList.forEach((subject) => {
         scoreFieldsDiv.innerHTML += `
@@ -119,7 +121,6 @@
         `;
     });
 
-    // ດຶງລາຍຊື່ຫ້ອງຮຽນທັງໝົດຈາກ Firebase
     function loadClasses() {
         fetch(${FIREBASE_BASE_URL}/classes.json)
             .then(res => res.json())
@@ -127,7 +128,6 @@
                 const classSelect = document.getElementById('classSelect');
                 classSelect.innerHTML = "";
 
-                // ຖ້າຍັງບໍ່ມີຫ້ອງຮຽນໃດໆ ให้ตั้งค่าเริ่มต้นไว้ก่อน
                 let classList = classes ? Object.values(classes) : ["M1", "M2", "M3", "M4", "M5", "M6"];
 
                 classList.forEach(cls => {
@@ -163,7 +163,6 @@
         }
     }
 
-    // ຟັງຊັນເພີ່ມຫ້ອງຮຽນໃໝ່
     function addNewClass() {
         const newClass = document.getElementById('newClassName').value.trim().toUpperCase();
         if (!newClass) {
@@ -179,7 +178,7 @@
         .then(() => {
             alert(✅ ເພີ່ມຫ້ອງ ${newClass} ສຳເລັດແລ້ວ!);
             document.getElementById('newClassName').value = "";
-            loadClasses(); // ໂຫຼດລາຍຊື່ຫ້ອງໃໝ່
+            loadClasses();
         })
         .catch(err => alert("❌ ເກີດຂໍ້ຜິດພາດ: " + err.message));
     }
