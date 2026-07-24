@@ -17,7 +17,7 @@
         .btn-add-class:hover { background: #138496; }
         .login-box { max-width: 400px; }
         .score-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; background: #fafafa; padding: 15px; border-radius: 8px; border: 1px solid #ddd; }
-        .hidden { display: none; }
+        .hidden { display: none !important; }
         .admin-badge { background: #dc3545; color: white; padding: 3px 8px; border-radius: 4px; font-size: 12px; float: right; }
         .add-class-box { background: #e9ecef; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px dashed #6c757d; }
     </style>
@@ -29,10 +29,10 @@
     <h2>🔐 ເຂົ້າສູ່ລະບົບປ້ອນຄະແນນ</h2>
     <div class="form-group">
         <label>ລະຫັດຜ່ານ (Passcode):</label>
-        <input type="password" id="passcode" placeholder="ປ້ອນລະຫັດຜ່ານຂອງຄູ">
+        <input type="password" id="passcode" placeholder="ປ້ອນລະຫັດຜ່ານຂອງຄູ" onkeypress="handleKeyPress(event)">
     </div>
-    <button onclick="checkLogin()">ເຂົ້າສູ່ລະບົບ</button>
-    <p id="loginError" style="color:red; text-align:center; margin-top:10px;"></p>
+    <button type="button" onclick="checkLogin()">ເຂົ້າສູ່ລະບົບ</button>
+    <p id="loginError" style="color:red; text-align:center; margin-top:10px; font-weight:bold;"></p>
 </div>
 
 <!-- 2. ໜ້າປ້ອນຄະແນນ -->
@@ -43,8 +43,8 @@
     <div id="addClassSection" class="add-class-box hidden">
         <label style="color:#0056b3;">➕ ເພີ່ມຫ້ອງຮຽນໃໝ່ (ສະເພາະແອັດມິນ):</label>
         <div style="display:flex; gap:10px;">
-            <input type="text" id="newClassName" placeholder="ເຊັ່ນ: M1, M2, M3_1">
-            <button class="btn-add-class" style="width:140px; margin:0;" onclick="addNewClass()">ເພີ່ມຫ້ອງ</button>
+            <input type="text" id="newClassName" placeholder="ເຊັ່ນ: M1, M2, M3">
+            <button type="button" class="btn-add-class" style="width:140px; margin:0;" onclick="addNewClass()">ເພີ່ມຫ້ອງ</button>
         </div>
     </div>
     
@@ -85,22 +85,22 @@
     <h3>📊 ປ້ອນຄະແນນແຕ່ລະວິຊາ (0 - 10)</h3>
     <div class="score-grid" id="scoreFields"></div>
 
-    <button onclick="saveScore()">💾 ບັນທຶກຄະແນນລົງລະບົບ</button>
+    <button type="button" onclick="saveScore()">💾 ບັນທຶກຄະແນນລົງລະບົບ</button>
     <p id="statusMsg" style="text-align:center; font-weight:bold; margin-top:15px;"></p>
 </div>
 
 <script>
     const FIREBASE_BASE_URL = "https://classscorem3-default-rtdb.firebaseio.com";
 
-    // 🔑 ຕັ້ງຄ່າລະຫັດຜ່ານ (ທ່ານຄູສາມາດເພີ່ມ/ແກ້ໄຂລະຫັດຜ່ານຢູ່ບ່ອນນີ້ໄດ້ເລີຍ)
+    // 🔑 ລະຫັດຜ່ານ
     const PASSCODES = {
-        "admin123": "ALL", // ລະຫັດແອັດມິນຫຼັກ (ເລືອກໄດ້ທຸກຫ້ອງ + ເພີ່ມຫ້ອງໃໝ່ໄດ້)
-        "passM1": "M1",    // ລະຫັດຄູ ມ.1
-        "passM2": "M2",    // ລະຫັດຄູ ມ.2
-        "passM3": "M3",    // ລະຫັດຄູ ມ.3
-        "passM4": "M4",    // ລະຫັດຄູ ມ.4
-        "passM5": "M5",    // ລະຫັດຄູ ມ.5
-        "passM6": "M6"     // ລະຫັດຄູ ມ.6
+        "admin123": "ALL",
+        "passM1": "M1",
+        "passM2": "M2",
+        "passM3": "M3",
+        "passM4": "M4",
+        "passM5": "M5",
+        "passM6": "M6"
     };
 
     const subjectsList = [
@@ -111,6 +111,7 @@
 
     let userRole = "";
 
+    // ສ້າງຊ່ອງປ້ອນຄະແນນ
     const scoreFieldsDiv = document.getElementById('scoreFields');
     subjectsList.forEach((subject) => {
         scoreFieldsDiv.innerHTML += `
@@ -121,29 +122,17 @@
         `;
     });
 
-    function loadClasses() {
-        fetch(${FIREBASE_BASE_URL}/classes.json)
-            .then(res => res.json())
-            .then(classes => {
-                const classSelect = document.getElementById('classSelect');
-                classSelect.innerHTML = "";
-
-                let classList = classes ? Object.values(classes) : ["M1", "M2", "M3", "M4", "M5", "M6"];
-
-                classList.forEach(cls => {
-                    classSelect.innerHTML += <option value="${cls}">ຫ້ອງ ${cls}</option>;
-                });
-
-                if (userRole !== "ALL" && userRole !== "") {
-                    classSelect.value = userRole;
-                    classSelect.disabled = true;
-                }
-            })
-            .catch(err => console.error("Error loading classes:", err));
+    function handleKeyPress(e) {
+        if (e.key === 'Enter') {
+            checkLogin();
+        }
     }
 
     function checkLogin() {
-        const pass = document.getElementById('passcode').value;
+        const passInput = document.getElementById('passcode');
+        const pass = passInput ? passInput.value.trim() : "";
+        const errorMsg = document.getElementById('loginError');
+
         if (PASSCODES[pass]) {
             userRole = PASSCODES[pass];
             document.getElementById('loginSection').classList.add('hidden');
@@ -159,8 +148,39 @@
                 document.getElementById('roleBadge').innerText = (ຄູປະຈຳຊັ້ນ ${userRole});
             }
         } else {
-            document.getElementById('loginError').innerText = "❌ ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ";
+            errorMsg.innerText = "❌ ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ";
         }
+    }
+
+    function loadClasses() {
+        fetch(${FIREBASE_BASE_URL}/classes.json)
+            .then(res => res.json())
+            .then(classes => {
+                const classSelect = document.getElementById('classSelect');
+                classSelect.innerHTML = "";
+
+                let classList = (classes && Object.keys(classes).length > 0) 
+                    ? Object.values(classes) 
+                    : ["M1", "M2", "M3", "M4", "M5", "M6"];
+
+                classList.forEach(cls => {
+                    classSelect.innerHTML += <option value="${cls}">ຫ້ອງ ${cls}</option>;
+                });
+
+                if (userRole !== "ALL" && userRole !== "") {
+                    classSelect.value = userRole;
+                    classSelect.disabled = true;
+                }
+            })
+            .catch(err => {
+                console.error("Error loading classes:", err);
+                const classSelect = document.getElementById('classSelect');
+                classSelect.innerHTML = `
+                    <option value="M1">ຫ້ອງ M1</option>
+                    <option value="M2">ຫ້ອງ M2</option>
+                    <option value="M3">ຫ້ອງ M3</option>
+                `;
+            });
     }
 
     function addNewClass() {
