@@ -32,6 +32,9 @@
         <input type="password" id="passcode" placeholder="ປ້ອນລະຫັດຜ່ານຂອງຄູ" onkeypress="handleKeyPress(event)">
     </div>
     <button type="button" onclick="checkLogin()">ເຂົ້າສູ່ລະບົບ</button>
+   <a href="index-tc.html" style="display: block; text-align: center; background-color: #045686; color: white; text-decoration: none; padding: 10px; border-radius: 6px; font-weight: bold; margin-top: 10px;">
+    ⬅️ ກັບຄືນໜ້າຫຼັກ (ກວດສອບຄະແນນ)
+</a>
     <p id="loginError" style="color:red; text-align:center; margin-top:10px; font-weight:bold;"></p>
 </div>
 
@@ -43,8 +46,11 @@
     <div id="addClassSection" class="add-class-box hidden">
         <label style="color:#0056b3;">➕ ເພີ່ມຫ້ອງຮຽນໃໝ່ (ສະເພາະແອັດມິນ):</label>
         <div style="display:flex; gap:10px;">
-            <input type="text" id="newClassName" placeholder="ເຊັ່ນ: M1, M2, M3">
+            <input type="text" id="newClassName" placeholder="ເຊັ່ນ:  ມໍ1, ມໍ2, ມໍ3">
             <button type="button" class="btn-add-class" style="width:140px; margin:0;" onclick="addNewClass()">ເພີ່ມຫ້ອງ</button>
+            <a href="index-tc.html" style="display: block; text-align: center; background-color: #045686; color: white; text-decoration: none; padding: 10px; border-radius: 6px; font-weight: bold; margin-top: 10px;">
+    ⬅️ ກັບຄືນໜ້າຫຼັກ (ກວດສອບຄະແນນ)
+</a>
         </div>
     </div>
     
@@ -80,13 +86,22 @@
         <label>ຊື່ ແລະ ນາມສະກຸນ:</label>
         <input type="text" id="studentName" placeholder="ປ້ອນຊື່ ແລະ ນາມສະກຸນ">
     </div>
+    <div class="form-group">
+        <label>ຊື່ຫຼິ້ນ:</label>
+        <input type="text" id="studentName" placeholder="ປ້ອນຊື່ຫຼິ້ນ">
+    </div>
 
     <hr>
     <h3>📊 ປ້ອນຄະແນນແຕ່ລະວິຊາ (0 - 10)</h3>
     <div class="score-grid" id="scoreFields"></div>
 
     <button type="button" onclick="saveScore()">💾 ບັນທຶກຄະແນນລົງລະບົບ</button>
+    <a href="index-tc.html" style="display: block; text-align: center; background-color: #045686; color: white; text-decoration: none; padding: 10px; border-radius: 6px; font-weight: bold; margin-top: 10px;">
+    ⬅️ ກັບຄືນໜ້າຫຼັກ (ກວດສອບຄະແນນ)
+</a>
     <p id="statusMsg" style="text-align:center; font-weight:bold; margin-top:15px;"></p>
+
+
 </div>
 
 <script>
@@ -95,12 +110,11 @@
     // 🔑 ລະຫັດຜ່ານ
     const PASSCODES = {
         "admin123": "ALL",
-        "passM1": "M1",
-        "passM2": "M2",
-        "passM3": "M3",
-        "passM4": "M4",
-        "passM5": "M5",
-        "passM6": "M6"
+        "passM1": "ມໍ1",
+        "passM2": "ມໍ2",
+        "passM3": "ມໍ3",
+        "passM4": "ມໍ4",
+      
     };
 
     const subjectsList = [
@@ -142,18 +156,18 @@
 
             if (userRole === "ALL") {
                 document.getElementById('addClassSection').classList.remove('hidden');
-                document.getElementById('roleBadge').innerText = (Super Admin Main);
+                document.getElementById('roleBadge').innerText = "(Super Admin Main)";
                 document.getElementById('roleBadge').className = 'admin-badge';
             } else {
-                document.getElementById('roleBadge').innerText = (ຄູປະຈຳຊັ້ນ ${userRole});
+                document.getElementById('roleBadge').innerText = `(ຄູປະຈຳຊັ້ນ ${userRole})`;
             }
         } else {
             errorMsg.innerText = "❌ ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ";
         }
     }
 
-    function loadClasses() {
-        fetch(${FIREBASE_BASE_URL}/classes.json)
+   function loadClasses() {
+        fetch(`${FIREBASE_BASE_URL}/classes.json`)
             .then(res => res.json())
             .then(classes => {
                 const classSelect = document.getElementById('classSelect');
@@ -161,10 +175,10 @@
 
                 let classList = (classes && Object.keys(classes).length > 0) 
                     ? Object.values(classes) 
-                    : ["M1", "M2", "M3", "M4", "M5", "M6"];
+                    : ["ມໍ1", "ມໍ2", "ມໍ3", "ມໍ4"];
 
                 classList.forEach(cls => {
-                    classSelect.innerHTML += <option value="${cls}">ຫ້ອງ ${cls}</option>;
+                    classSelect.innerHTML += `<option value="${cls}">ຫ້ອງ ${cls}</option>`;
                 });
 
                 if (userRole !== "ALL" && userRole !== "") {
@@ -176,9 +190,10 @@
                 console.error("Error loading classes:", err);
                 const classSelect = document.getElementById('classSelect');
                 classSelect.innerHTML = `
-                    <option value="M1">ຫ້ອງ M1</option>
-                    <option value="M2">ຫ້ອງ M2</option>
-                    <option value="M3">ຫ້ອງ M3</option>
+                    <option value="ມໍ1">ຫ້ອງ ມໍ1</option>
+                    <option value="ມໍ2">ຫ້ອງ ມໍ2</option>
+                    <option value="ມໍ3">ຫ້ອງ ມໍ3</option>
+                    <option value="ມໍ4">ຫ້ອງ ມໍ4</option>     
                 `;
             });
     }
@@ -190,13 +205,13 @@
             return;
         }
 
-        fetch(${FIREBASE_BASE_URL}/classes/${newClass}.json, {
+        fetch(`${FIREBASE_BASE_URL}/classes/${newClass}.json`, {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(newClass)
         })
         .then(() => {
-            alert(✅ ເພີ່ມຫ້ອງ ${newClass} ສຳເລັດແລ້ວ!);
+            alert(`✅ ເພີ່ມຫ້ອງ ${newClass} ສຳເລັດແລ້ວ!`);
             document.getElementById('newClassName').value = "";
             loadClasses();
         })
@@ -234,7 +249,7 @@
             scores: scoresData
         };
 
-        const firebaseUrl = ${FIREBASE_BASE_URL}/students_${studentClass}/${studentId}/months/${selectedMonth}.json;
+        const firebaseUrl = `${FIREBASE_BASE_URL}/students_${studentClass}/${studentId}/months/${selectedMonth}.json`;
 
         fetch(firebaseUrl, {
             method: 'PATCH',
