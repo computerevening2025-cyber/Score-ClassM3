@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ກວດສອບຄະແນນ ຫ້ອງ ມ3</title>
+    <title>ກວດສອບຄະແນນນັກຮຽນ</title>
     <style>
         body { font-family: 'Phetsarath OT', sans-serif; padding: 20px; background-color: #f0f2f5; }
         .card { background: white; padding: 25px; border-radius: 12px; max-width: 500px; margin: auto; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
@@ -19,14 +19,25 @@
         .val { text-align: right; color: #0056b3; font-weight: bold; }
         .highlight { background-color: #e8f4fe !important; font-weight: bold; }
         .rank-val { color: #d9534f; font-size: 18px; }
+        .admin-link { text-align: right; margin-bottom: 10px; }
+        .admin-link a { color: #6c757d; font-size: 13px; text-decoration: none; }
     </style>
 </head>
 <body>
 
 <div class="card">
+    <!-- ປຸ່ມທາງເຂົ້າສຳລັບຄູ -->
+    <div class="admin-link">
+        <a href="admin.html">⚙️ ສຳລັບຄູປະຈຳຊັ້ນ (ປ້ອນຄະແນນ)</a>
+    </div>
+
     <div class="search-box">
-        <h2>🔍 ກວດສອບຄະແນນ ຫ້ອງ ມ3</h2>
+        <h2>🔍 ກວດສອບຄະແນນນັກຮຽນ</h2>
         
+        <select id="classSelect">
+            <option value="">-- ກຳລັງໂຫຼດຫ້ອງຮຽນ... --</option>
+        </select>
+        <br>
         <select id="monthSelect">
             <option value="month_9">ຄະແນນ ປະຈຳເດືອນ 9</option>
             <option value="month_10">ຄະແນນ ປະຈຳເດືອນ 10</option>
@@ -49,22 +60,30 @@
 </div>
 
 <script>
+    const FIREBASE_BASE_URL = "https://classscorem3-default-rtdb.firebaseio.com";
+
     var subjectsList = [
-        "ພາສາລາວ-ວັນນະຄະດີ",
-        "ຄະນິດສາດ",
-        "ວິທະຍາສາດທຳມະຊາດ",
-        "ພູມສາດ",
-        "ປະຫວັດສາດ",
-        "ສຶກສາພົນລະເມືອງ",
-        "ຄອມພິວເຕີ້",
-        "ພື້ນຖານວິຊາຊີບ",
-        "ພາສາອັງກິດ",
-        "ສິລະປະກຳ",
-        "ສິລະປະດົນຕີ",
-        "ພະລະສຶກສາ"
+        "ພາສາລາວ-ວັນນະຄະດີ", "ຄະນິດສາດ", "ວິທະຍາສາດທຳມະຊາດ", "ພູມສາດ",
+        "ປະຫວັດສາດ", "ສຶກສາພົນລະເມືອງ", "ຄອມພິວເຕີ້", "ພື້ນຖານວິຊາຊີບ",
+        "ພາສາອັງກິດ", "ສິລະປະກຳ", "ສິລະປະດົນຕີ", "ພະລະສຶກສາ"
     ];
 
+    function loadClasses() {
+        fetch(${FIREBASE_BASE_URL}/classes.json)
+            .then(res => res.json())
+            .then(classes => {
+                const classSelect = document.getElementById('classSelect');
+                classSelect.innerHTML = "";
+                let classList = classes ? Object.values(classes) : ["M1", "M2", "M3", "M4", "M5", "M6"];
+                classList.forEach(cls => {
+                    classSelect.innerHTML += <option value="${cls}">ຫ້ອງ ${cls}</option>;
+                });
+            })
+            .catch(err => console.error(err));
+    }
+
     function runSearch() {
+        var studentClass = document.getElementById('classSelect').value;
         var id = document.getElementById('studentId').value.trim();
         var selectedMonth = document.getElementById('monthSelect').value;
         var resultDiv = document.getElementById('result');
@@ -76,14 +95,13 @@
 
         resultDiv.innerHTML = "<p style='text-align:center;'>ກຳລັງຄົ້ນຫາ ແລະ ໄລ່ອັນດັບທີ...</p>";
 
-        // ดึงข้อมูลนักเรียนทั้งหมดใน Firebase มาเพื่อคำนวณอันดับที่
-        var allStudentsUrl = "https://classscorem3-default-rtdb.firebaseio.com/students.json";
+        var allStudentsUrl = ${FIREBASE_BASE_URL}/students_${studentClass}.json;
 
         fetch(allStudentsUrl)
             .then(function(response) { return response.json(); })
             .then(function(allStudents) {
                 if (!allStudents || !allStudents[id]) {
-                    resultDiv.innerHTML = "<p style='color:red; text-align:center;'>❌ ບໍ່ພົບຂໍ້ມູນລະຫັດນັກຮຽນນີ້</p>";
+                    resultDiv.innerHTML = "<p style='color:red; text-align:center;'>❌ ບໍ່ພົບຂໍ້ມູນລະຫັດນັກຮຽນນີ້ໃນຫ້ອງນີ້</p>";
                     return;
                 }
 
@@ -95,7 +113,6 @@
                     return;
                 }
 
-                // --- 1. คำนวณคะแนนรวมของนักเรียนทุกคนในห้องประจำเดือนนี้ ---
                 var studentTotals = [];
                 var totalStudentsCount = 0;
 
@@ -115,10 +132,8 @@
                     }
                 });
 
-                // เรียงลำดับคะแนนรวมจาก "มากไปน้อย"
                 studentTotals.sort(function(a, b) { return b.total - a.total; });
 
-                // หาอันดับที่ของนักเรียนคนนี้
                 var currentRank = 0;
                 for (var r = 0; r < studentTotals.length; r++) {
                     if (studentTotals[r].id === id) {
@@ -127,14 +142,12 @@
                     }
                 }
 
-                // --- 2. คำนวณคะแนนของนักเรียนคนปัจจุบัน ---
                 var total = 0;
                 var count = 0;
                 var rowsHtml = "";
 
                 rowsHtml += "<tr><td class='label'>ລະຫັດ:</td><td class='val'>" + (student.studentId || id) + "</td></tr>";
                 rowsHtml += "<tr><td class='label'>ຊື່ ແລະ ນາມສະກຸນ:</td><td class='val'>" + (student.name || '-') + "</td></tr>";
-                rowsHtml += "<tr><td class='label'>ຊື່ຫຼິ້ນ:</td><td class='val'>" + (student.nickname || '-') + "</td></tr>";
 
                 for (var m = 0; m < subjectsList.length; m++) {
                     var sName = subjectsList[m];
@@ -163,18 +176,7 @@
     document.getElementById('searchBtn').addEventListener('click', runSearch);
 
     window.addEventListener('DOMContentLoaded', function() {
-        var urlParams = new URLSearchParams(window.location.search);
-        var urlId = urlParams.get('id');
-        var urlMonth = urlParams.get('month');
-
-        if (urlMonth) {
-            document.getElementById('monthSelect').value = urlMonth;
-        }
-
-        if (urlId) {
-            document.getElementById('studentId').value = urlId;
-            runSearch();
-        }
+        loadClasses();
     });
 </script>
 
